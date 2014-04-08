@@ -4,19 +4,21 @@ module ElxChatServer
     
     def incoming(message, callback)
       
-      if message["channel"] == "/meta/subscribe" and match = message["subscription"].match(/^\/chat\/(\w+)$/)
-        faye_client.publish('/admin/chat/subscribe', {action: "new subscription", client: "#{match[1]}", message: "Client #{match[1]} arrived"})
+      if message["channel"] == "/meta/subscribe" and match = message["subscription"].match(/^\/chat\/([\w\-]+)$/)
+
+        faye_client.publish('/admin/chat/subscribe', 
+                            { action: "new subscription", 
+                              token: "#{match[1]}", 
+                              clientId: message["clientId"], 
+                              message: "Client #{match[1]} arrived with id: #{message['clientId']} subscribe: #{message['subscription']}"})
       end
 
-
       puts "Incoming #{message.inspect}"
-
-
       callback.call(message)
     end
 
     def outgoing(message, callback)
-      puts "Outgoing: #{message.inspect}"
+      # puts "Outgoing: #{message.inspect}"
       callback.call message
     end
 
